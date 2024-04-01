@@ -1,29 +1,15 @@
-
-import { parentPort } from "worker_threads";
+import { parentPort } from "worker_threads"; 
+import { AgeTester, AgeError } from "./ageTester"; 
 
 var currentParentPort = parentPort!;
 
-var onMessageFunction = (message: string) => {
-    const result = `Worker Success! \n A Message Has Been Recived. \n The Message: "${message}". \n`;
-    currentParentPort.postMessage(result);
-}
-
-var onErrorFunction = (error: string) => {
-    const result = `Worker Error! \n No Message Has Been Recived. \n Error: ${error}. \n`;
-    currentParentPort.postMessage(result);
-}
-
 currentParentPort.on('message', (message: string) => {
-    try{
-        if (message == null) {
-            throw new Error("Illegal Message.")
-        }
-        onMessageFunction(message);
-    } catch(error: any) {
-        onErrorFunction(error.message);
-    }
+    var givenAge = Number.parseInt(message);
+    AgeTester.test(givenAge);
+    currentParentPort.postMessage('Success!');
+});
+currentParentPort.on('error', (error : Error) => {
+    currentParentPort.postMessage(error);
 });
 
-currentParentPort.on('error', (error: string) => {
-    onErrorFunction(error);
-});
+export {};
